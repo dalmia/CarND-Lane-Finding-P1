@@ -3,39 +3,43 @@
 
 <img src="examples/laneLines_thirdPass.jpg" width="480" alt="Combined Image" />
 
-Overview
----
+### Overview
 
 When we drive, we use our eyes to decide where to go.  The lines on the road that show us where the lanes are act as our constant reference for where to steer the vehicle.  Naturally, one of the first things we would like to do in developing a self-driving car is to automatically detect lane lines using an algorithm.
 
-In this project you will detect lane lines in images using Python and OpenCV.  OpenCV means "Open-Source Computer Vision", which is a package that has many useful tools for analyzing images.  
+In this project we detect lane lines in images using Python and OpenCV. 
 
-To complete the project, two files will be submitted: a file containing project code and a file containing a brief write up explaining your solution. We have included template files to be used both for the [code](https://github.com/udacity/CarND-LaneLines-P1/blob/master/P1.ipynb) and the [writeup](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md).The code file is called P1.ipynb and the writeup template is writeup_template.md 
+### 1. Pipeline:
 
-To meet specifications in the project, take a look at the requirements in the [project rubric](https://review.udacity.com/#!/rubrics/322/view)
+The pipeline broadly consists of 5 steps. The output after each stage is shown:
 
+1) The images are converted to grayscale:
 
-Creating a Great Writeup
----
-For this project, a great writeup should provide a detailed response to the "Reflection" section of the [project rubric](https://review.udacity.com/#!/rubrics/322/view). There are three parts to the reflection:
+![gray](examples/gray.png)
 
-1. Describe the pipeline
+2) Gaussian Smoothing is applied with a kernel size of 5.
 
-2. Identify any shortcomings
+![blur](examples/blur.png)
 
-3. Suggest possible improvements
+3) Canny Edge detection is used next with low and high thresholds 50 and 150 respectively.
 
-We encourage using images in your writeup to demonstrate how your pipeline works.  
+![canny](examples/canny.png)
 
-All that said, please be concise!  We're not looking for you to write a book here: just a brief description.
+4) We specify a Region of interest (RoI) and mask all the values of the image returned by the previous step outside this RoI as 0. Hough transform is then applied on top of the masked output to get the detected lines. However, these lines are disjoint on either side and we so, modify the `drawLines()` functions (explained later) to extrapolate the detected lines so that they form one continuous chunk on both sides.
 
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup. Here is a link to a [writeup template file](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md). 
+![hough](examples/hough.png)
 
+5) Finally, we superimpose this on top of the image to get the final result.
 
-The Project
----
+![final](examples/final.png)
 
-## If you have already installed the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) you should be good to go!   If not, you should install the starter kit to get started on this project. ##
+As mentioned in Step 4 above, Hough transform returns various lines which are discontinuous on either side. But we want a single lane line. There are various ways to do this. The approach I followed was to first identify the lane line with the maximum length on both sides. We already specify the RoI and using the RoI vertices, we identify the top horizontal line and the bottom horizontal line. Then, we find the intersection of the largest left and right lane lines with both the top and bottom horizontal lines. An example is shown below:
+
+![draw lines](examples/draw_lines_explain.jpg)
+
+### The Project
+
+If you have already installed the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) you should be good to go!   If not, you should install the starter kit to get started on this project.
 
 **Step 1:** Set up the [CarND Term1 Starter Kit](https://classroom.udacity.com/nanodegrees/nd013/parts/fbf77062-5703-404e-b60c-95b78b2f3f9e/modules/83ec35ee-1e02-48a5-bdb7-d244bd47c2dc/lessons/8c82408b-a217-4d09-b81d-1bda4c6380ef/concepts/4f1870e0-3849-43e4-b670-12e6f2d4b7a7) if you haven't already.
 
@@ -48,9 +52,4 @@ Jupyter is an Ipython notebook where you can run blocks of code and see results 
 `> jupyter notebook`
 
 A browser window will appear showing the contents of the current directory.  Click on the file called "P1.ipynb".  Another browser window will appear displaying the notebook.  Follow the instructions in the notebook to complete the project.  
-
-**Step 3:** Complete the project and submit both the Ipython notebook and the project writeup
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
 
