@@ -2,7 +2,7 @@
 
 In this project we detect lane lines in images using Python and OpenCV! The final output on one of the test videos is shown below.
 
-![Test video](https://github.com/dalmia/CarND-Lane-Finding-P1/blob/master/test_videos_output/solidWhiteRight.mp4)
+![Test video](examples/result.gif)
 
 ---
 
